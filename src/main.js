@@ -56,6 +56,8 @@ function rendering() {
     var mPerspective = perspective(60.0, areaWidth / areaHeight, 1.0, 100.0);
     var mView = lookAt(new Vector(4, 4, 4), new Vector(1, 1, 1), new Vector(0, 1, 0));
     var WVP = transpose(multiplyMM(transpose(mPerspective), multiplyMM(transpose(mView), mWorld)));
+    console.log(WVP.toString());
+    console.log(inverse(WVP).toString());
     
     spaceCraft.draw(WVP);
     //window.requestAnimFrame(rendering, canvas);

@@ -38,8 +38,8 @@ function Box(pos, dim, glContext) {
     this.program = new Program(this.glContext);
     
     this.mModel = new Matrix(1.0);
-    this.mTranslate = translate(new Matrix(1.0), pos);
-    this.mRotate = new Matrix(1.0);
+//    this.mTranslate = translate(new Matrix(1.0), pos);
+//    this.mRotate = new Matrix(1.0);
 }
 
 Box.prototype = {
@@ -99,10 +99,10 @@ Box.prototype = {
     },
     
     draw: function(WVP) {
-        this.mModel = multiplyMM(this.mTranslate, this.mRotate);
+//        this.mModel = multiplyMM(this.mTranslate, this.mRotate);
         var lMVP = transpose(multiplyMM(transpose(WVP), this.mModel));
         
-        this.program.use();
+//        this.program.use();
         this.glContext.uniform3fv(this.glContext.getUniformLocation(this.program.program, "color"), this.color.arrayRep);
         this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "MVP"), false, lMVP.array);
         
@@ -114,13 +114,21 @@ Box.prototype = {
         this.glContext.disableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
     },
     
-    rotateM: function(mRot) {
+    setModelMatrix: function(newModelMatrix) {
+        this.mModel = newModelMatrix;
+    },
+    
+    getProgramObject: function() {
+        return this.program;
+    },
+    
+/*    rotateM: function(mRot) {
         this.mRotate = mRot;
     },
     
     translateM: function(mTrans) {
         this.mTranslate = mTrans;
-    },
+    },*/
     
     clear: function() {
         this.program.deleteProgram();

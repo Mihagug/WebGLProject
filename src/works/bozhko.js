@@ -45,7 +45,6 @@ function SpaceCraft(glContext) {
         this.panels[i].setColor(new Vector(0.4, 0.4, 1.0));
     }
     
-    
     this.glContext = glContext;
     this.j = 0;
 }
@@ -61,9 +60,11 @@ SpaceCraft.prototype = {
     draw: function(WVP) {
         if (this.j == resultsSpaceCraft.length - 1)
             this.j = 0;
-        var t1, t2, t3, t4;
         
-        t1 = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
+        //var t1, t2, t3, t4;
+        var panelsModelMats = [];
+        
+        /*t1 = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
         t2 = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
         t3 = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
         t4 = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
@@ -86,11 +87,36 @@ SpaceCraft.prototype = {
         this.panels[0].translateM(translate(t1, new Vector(0.53, -0.5, 0.0)));
         this.panels[1].translateM(translate(t2, new Vector(0.53, -0.5, -0.53)));
         this.panels[2].translateM(translate(t3, new Vector(0.53, -0.5, 0.53)));
-        this.panels[3].translateM(translate(t4, new Vector(0.56, -0.5, 0.0)));
+        this.panels[3].translateM(translate(t4, new Vector(0.56, -0.5, 0.0)));*/
+        
+        //first panel
+        panelsModelMats[0] = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
+        panelsModelMats[0] = rotate(panelsModelMats[0], -resultsSpaceCraft[this.j][0], new Vector(0.0, 0.0, 1.0));
+        panelsModelMats[0] = translate(panelsModelMats[0], new Vector(0.53, -0.5, 0.0));
+        //second panel
+        panelsModelMats[1] = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
+        panelsModelMats[1] = translate(panelsModelMats[1], new Vector(0.0, 0.0, -0.5));
+        panelsModelMats[1] = rotate(panelsModelMats[1], -resultsSpaceCraft[this.j][1], new Vector(1.0, 0.0, 0.0));
+        panelsModelMats[1] = rotate(panelsModelMats[1], -resultsSpaceCraft[this.j][0], new Vector(0.0, 0.0, 1.0));
+        panelsModelMats[1] = translate(panelsModelMats[1], new Vector(0.53, -0.5, -0.53));
+        //third panel
+        panelsModelMats[2] = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
+        panelsModelMats[2] = translate(panelsModelMats[2], new Vector(0.0, 0.0, 0.5));
+        panelsModelMats[2] = rotate(panelsModelMats[2], -resultsSpaceCraft[this.j][2], new Vector(1.0, 0.0, 0.0));
+        panelsModelMats[2] = rotate(panelsModelMats[2], -resultsSpaceCraft[this.j][0], new Vector(0.0, 0.0, 1.0));
+        panelsModelMats[2] = translate(panelsModelMats[2], new Vector(0.53, -0.5, 0.53));
+        //fourth panel
+        panelsModelMats[3] = translate(new Matrix(1.0), new Vector(0.5, 0.0, 0.0));
+        panelsModelMats[3] = rotate(panelsModelMats[3], -resultsSpaceCraft[this.j][3], new Vector(0.0, 0.0, 1.0));
+        panelsModelMats[3] = translate(panelsModelMats[3], new Vector(1.0, 0.0, 0.0));
+        panelsModelMats[3] = rotate(panelsModelMats[3], -resultsSpaceCraft[this.j][0], new Vector(0.0, 0.0, 1.0));
+        panelsModelMats[3] = translate(panelsModelMats[3], new Vector(0.56, -0.5, 0.0));
 
-            
+        this.mainBox.getProgramObject().use();
         this.mainBox.draw(WVP);
         for (var i = 0; i < 4; i++) {
+            this.panels[i].setModelMatrix(panelsModelMats[i]);
+            this.panels[i].getProgramObject().use();
             this.panels[i].draw(WVP);
         }
         
