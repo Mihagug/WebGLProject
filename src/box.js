@@ -27,6 +27,7 @@ function Box(pos, dim, glContext) {
     
     this.vbo = this.glContext.createBuffer();
     this.vbi = this.glContext.createBuffer();
+    this.vbn = this.glContext.createBuffer();
     
     this.shader = [];
     this.shader[0] = new Shader(this.glContext, this.glContext.VERTEX_SHADER);
@@ -76,11 +77,51 @@ Box.prototype = {
             7, 6, 2, 7, 3
         ];
         
+        var normals = [
+            -1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
+            -1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
+            -1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, 1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, 1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0,
+            
+            -1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0
+        ];
+        
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(verticies), this.glContext.STATIC_DRAW);
         this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vPos"), 3, this.glContext.FLOAT, false, 0, 0);
         this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
         
+        if (this.glContext.getAttribLocation(this.program.program, "vNormals") > 0) {
+            this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbn);
+            this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(normals), this.glContext.STATIC_DRAW);
+            this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vNormals"), 3, this.glContext.FLOAT, false, 0, 0);
+            this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vNormals"));
+        }
         
         this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.vbi);
         this.glContext.bufferData(this.glContext.ELEMENT_ARRAY_BUFFER, new Uint8Array(indicies), this.glContext.STATIC_DRAW);
@@ -134,5 +175,6 @@ Box.prototype = {
         this.program.deleteProgram();
         this.glContext.deleteBuffer(this.vbo);
         this.glContext.deleteBuffer(this.vbi);
+        this.glContext.deleteBuffer(this.vbn);
     }
 };
