@@ -41,6 +41,28 @@ Matrix.prototype = {
     }
 };
 
+function matrix_track(mat) {
+    var res = 0.0;
+    
+    for (var i = 0; i < mat.len(); i++) {
+        res += mat.array[i * mat.len() + i];
+    }
+    
+    return res;
+}
+
+function determinant(mat) {
+    var mat2 = multiplyMM(mat, mat);
+    var mat3 = multiplyMM(mat2, mat);
+    var mat4 = multiplyMM(mat3, mat);
+    var trMat = matrix_track(mat);
+    var trMat2 = matrix_track(mat2);
+    var trMat3 = matrix_track(mat3);
+    var trMat4 = matrix_track(mat4);
+    
+    return (1.0 / 24.0 * (Math.pow(trMat, 4) - 6 * trMat2 * Math.pow(trMat, 2) + 3 * trMat2 * trMat2 + 8 * trMat3 * trMat - 6 * trMat4 ));
+}
+
 function transpose(mat) {
     var res = new Matrix(mat.array);
     
@@ -55,6 +77,19 @@ function transpose(mat) {
     }
     
     return res;
+}
+
+function multiplyMN(mat, num) {
+    var len = mat.len();
+    var res = [];
+    
+    for (var i = 0; i < len; i++) {
+        for (var j = 0; j < len; j++) {
+            res[i * len + j] = mat.array[i * len + j] * num;
+        }
+    }
+    
+    return new Matrix(res);
 }
 
 function multiplyMM(mat1, mat2) {
@@ -77,21 +112,42 @@ function multiplyMM(mat1, mat2) {
 function addMatrices(mat1, mat2) {
     var res = new Matrix(1.0);
     
-    for (var i = 0; i < mat1.len(); i++) {
+    for (var i = 0; i < mat1.len() * mat1.len(); i++) {
         res.array[i] = mat1.array[i] + mat2.array[i];
     }
     
-    return res;
+    return new Matrix(res.array);
 }
 
 function subMatrices(mat1, mat2) {
     var res = new Matrix(1.0);
     
-    for (var i = 0; i < mat1.len(); i++) {
+    for (var i = 0; i < mat1.len() * mat1.len(); i++) {
         res.array[i] = mat1.array[i] - mat2.array[i];
     }
     
-    return res;
+    return new Matrix(res.array);
+}
+
+function inverse(mat) {
+    var det = determinant(mat);
+    
+    var mat2 = multiplyMM(mat, mat);
+    var mat3 = multiplyMM(mat2, mat);
+    
+    var trMat = matrix_track(mat);
+    var trMat2 = matrix_track(mat2);
+    var trMat3 = matrix_track(mat3);
+    
+    var C1 = 1.0 / 6.0 * (trMat*trMat*trMat - 3.0 * trMat * trMat2 + 2.0 * trMat3);
+    var C2 = 0.5 * (trMat*trMat - trMat2);
+    
+    var R1 = multiplyMN(new Matrix(1.0), C1);
+    var R2 = multiplyMN(mat, - C2);
+    var R3 = multiplyMN(mat2, trMat);
+    var R4 = multiplyMN(mat3, -1.0);
+    
+    return multiplyMN(addMatrices(R1, addMatrices(R2, addMatrices(R3, R4))), 1.0 / det);
 }
 
 function translate(mat, vec) {
