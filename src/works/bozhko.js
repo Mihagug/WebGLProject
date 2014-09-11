@@ -14,31 +14,46 @@ var panelVShader = [
     "#version 100",
     "precision highp float;",
     "attribute vec4 vPos;",
+    "attribute vec3 vNormals;",
+    "",
     "uniform mat4 MVP;",
+    "uniform mat4 normMatrix;",
+    "",
+    "varying vec3 vDefNormals;",
+    "",
     "void main() {",
     "   gl_Position = MVP * vPos;",
+    "   vDefNormals = (normMatrix * vec4(vNormals, 0.0)).xyz;",
     "}"
 ].join("\n");
+
 var panelFShader = [
     "#version 100",
     "precision highp float;",
     "uniform vec3 color;",
+    "varying vec3 vDefNormals;",
+    "struct DirLight {",
+    "   vec3 vColor;",
+    "   vec3 vDirection;",
+    "   float ambientIntensity;",
+    "};",
+    "uniform DirLight sunLight;",
     "void main() {",
-    "   gl_FragColor = vec4(color, 1.0);",
+    "   float fDiffuseIntensity = max(0.0, dot(normalize(vDefNormals), -sunLight.vDirection));",
+    "   gl_FragColor = vec4(color, 1.0) * vec4(sunLight.vColor * (sunLight.ambientIntensity + fDiffuseIntensity), 1.0);",
+    "   //gl_FragColor = vec4(color, 1.0);",
     "}"
 ].join("\n");
 
 function SpaceCraft(glContext) {
     this.mainBox = new Box(new Vector(0, 0, 0), new Vector(1.0, 1.0, 1.0), glContext);
     this.panels = [];
-//    this.panels[0] = new Box(new Vector(1.03, -0.5, 0.0), new Vector(1.0, 0.1, 1.0), glContext);
-//    this.panels[1] = new Box(new Vector(1.03, -0.5, -1.03), new Vector(1.0, 0.1, 1.0), glContext);
-//    this.panels[2] = new Box(new Vector(1.03, -0.5, 1.03), new Vector(1.0, 0.1, 1.0), glContext);
-//    this.panels[3] = new Box(new Vector(2.06, -0.5, 0.0), new Vector(1.0, 0.1, 1.0), glContext);
+
     this.panels[0] = new Box(new Vector(0, 0, 0.0), new Vector(1.0, 0.01, 1.0), glContext);
     this.panels[1] = new Box(new Vector(1.03, -0.5, -1.03), new Vector(1.0, 0.01, 1.0), glContext);
     this.panels[2] = new Box(new Vector(1.03, -0.5, 1.03), new Vector(1.0, 0.01, 1.0), glContext);
     this.panels[3] = new Box(new Vector(2.06, -0.5, 0.0), new Vector(1.0, 0.01, 1.0), glContext);
+    
     for(var i = 0; i < 4; i++) {
         this.panels[i].setVertexShader(panelVShader);
         this.panels[i].setFragmentShader(panelFShader);
@@ -117,6 +132,10 @@ SpaceCraft.prototype = {
         for (var i = 0; i < 4; i++) {
             this.panels[i].setModelMatrix(panelsModelMats[i]);
             this.panels[i].getProgramObject().use();
+            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "normMatrix"), this.glContext.FALSE, (inverse(WV)).array);
+            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vColor"), [0.6, 0.6, 0.6]);
+            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vDirection"), [0.0, 1.0, 0.0]);
+            this.glContext.uniform1f(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.ambientIntention"), 0.1);
             this.panels[i].draw(WVP);
         }
         
