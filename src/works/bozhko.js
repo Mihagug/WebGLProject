@@ -79,14 +79,14 @@ SpaceCraft.prototype = {
         t3 = rotate(t3, -resultsSpaceCraft[this.j][2], new Vector(1.0, 0.0, 0.0));
         t3 = rotate(t3, -resultsSpaceCraft[this.j][0], new Vector(0.0, 0.0, 1.0));
         //fourth panel
-        //t4 = translate(t4, new Vector(0.5, 0.0, 0.0));
-//        t4 = rotate(t4, -resultsSpaceCraft[0][3], new Vector(0.0, 0.0, 1.0));
+        t4 = rotate(t4, -resultsSpaceCraft[this.j][3], new Vector(0.0, 0.0, 1.0));
+        t4 = translate(t4, new Vector(1.0, 0.0, 0.0));
         t4 = rotate(t4, -resultsSpaceCraft[this.j][0], new Vector(0.0, 0.0, 1.0));
         
         this.panels[0].translateM(translate(t1, new Vector(0.53, -0.5, 0.0)));
         this.panels[1].translateM(translate(t2, new Vector(0.53, -0.5, -0.53)));
         this.panels[2].translateM(translate(t3, new Vector(0.53, -0.5, 0.53)));
-        this.panels[3].translateM(translate(t4, new Vector(1.56, -0.5, 0.0)));
+        this.panels[3].translateM(translate(t4, new Vector(0.56, -0.5, 0.0)));
 
             
         this.mainBox.draw(WVP);
