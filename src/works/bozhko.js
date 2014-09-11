@@ -47,8 +47,10 @@ var panelFShader = [
 
 function SpaceCraft(glContext) {
     this.mainBox = new Box(new Vector(0, 0, 0), new Vector(1.0, 1.0, 1.0), glContext);
+//    this.mainBox.setVertexShader(panelVShader);
+//    this.mainBox.setFragmentShader(panelFShader);
+    
     this.panels = [];
-
     this.panels[0] = new Box(new Vector(0, 0, 0.0), new Vector(1.0, 0.01, 1.0), glContext);
     this.panels[1] = new Box(new Vector(1.03, -0.5, -1.03), new Vector(1.0, 0.01, 1.0), glContext);
     this.panels[2] = new Box(new Vector(1.03, -0.5, 1.03), new Vector(1.0, 0.01, 1.0), glContext);
@@ -128,13 +130,17 @@ SpaceCraft.prototype = {
         panelsModelMats[3] = translate(panelsModelMats[3], new Vector(0.56, -0.5, 0.0));
 
         this.mainBox.getProgramObject().use();
+//        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "normMatrix"), this.glContext.FALSE, transpose(inverse(WV)).array);
+//        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "sunLight.vColor"), [0.5, 0.5, 0.5]);
+//        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "sunLight.vDirection"), [0.0, 10.0, 0.0]);
+//        this.glContext.uniform1f(this.glContext.getUniformLocation(this.mainBox.program.program, "sunLight.ambientIntention"), 0.1);
         this.mainBox.draw(WVP);
         for (var i = 0; i < 4; i++) {
             this.panels[i].setModelMatrix(panelsModelMats[i]);
             this.panels[i].getProgramObject().use();
-            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "normMatrix"), this.glContext.FALSE, (inverse(WV)).array);
-            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vColor"), [0.6, 0.6, 0.6]);
-            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vDirection"), [0.0, 1.0, 0.0]);
+            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "normMatrix"), this.glContext.FALSE, transpose(inverse(WV)).array);
+            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vColor"), [0.2, 0.2, 0.2]);
+            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vDirection"), [0.0, 10.0, 0.0]);
             this.glContext.uniform1f(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.ambientIntention"), 0.1);
             this.panels[i].draw(WVP);
         }
