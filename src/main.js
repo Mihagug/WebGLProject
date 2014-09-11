@@ -22,6 +22,7 @@ window.onresize = function() {
     canvas.height = areaHeight;
     gl = WebGLUtils.setupWebGL(canvas);
     gl.viewport(0, 0, areaWidth, areaHeight);
+    //This is a test
 }
 
 window.onload = function () {
