@@ -39,8 +39,6 @@ function Box(pos, dim, glContext) {
     this.program = new Program(this.glContext);
     
     this.mModel = new Matrix(1.0);
-//    this.mTranslate = translate(new Matrix(1.0), pos);
-//    this.mRotate = new Matrix(1.0);
 }
 
 Box.prototype = {
@@ -139,23 +137,20 @@ Box.prototype = {
     },
     
     draw: function(WVP) {
-//        this.mModel = multiplyMM(this.mTranslate, this.mRotate);
-        var lMVP = transpose(multiplyMM(transpose(WVP), this.mModel));
+        var MVP = multiplyMM(WVP, this.mModel);
         
-//        this.program.use();
         this.glContext.uniform3fv(this.glContext.getUniformLocation(this.program.program, "color"), this.color.arrayRep);
-        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "MVP"), false, lMVP.array);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "MVP"), false, MVP.array);
         
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
         this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vPos"), 3, this.glContext.FLOAT, false, 0, 0);
-        /*if (this.glContext.getAttribLocation(this.program.program, "vNormals") > 0) {
+        if (this.glContext.getAttribLocation(this.program.program, "vNormals") > 0) {
             this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbn);
             this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vNormals"), 3, this.glContext.FLOAT, false, 0, 0);
             this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vNormals"));
-        }*/
+        }
         this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.vbi);
-        //this.glContext.drawElements(this.glContext.TRIANGLE_STRIP, 6*5, this.glContext.UNSIGNED_BYTE, 0);
         this.glContext.drawElements(this.glContext.TRIANGLES, 6 * 3 * 2, this.glContext.UNSIGNED_BYTE, 0);
         this.glContext.disableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
     },

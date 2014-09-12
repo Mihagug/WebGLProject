@@ -56,8 +56,13 @@ function rendering() {
     var mWorld = multiplyMM(mTranslate, mRot);
     var mPerspective = perspective(60.0, areaWidth / areaHeight, 1.0, 100.0);
     var mView = lookAt(new Vector(4, 4, 4), new Vector(1, 1, 1), new Vector(0, 1, 0));
-    var WVP = transpose(multiplyMM(transpose(mPerspective), multiplyMM(transpose(mView), mWorld)));
-    WV = multiplyMM(transpose(mView), mWorld);
+    var WVP = multiplyMM(mPerspective, multiplyMM(mView, mWorld));
+    WV = mWorld;//multiplyMM(mView, mWorld);
+    
+    var rot = rotate(new Matrix(1.0), 30.0 * Math.PI / 180.0, new Vector(0.0, 0.0, 1.0));
+    var t = translate(new Matrix(1.0), new Vector(1.0, 1.0, 1.0));
+    //console.log(/*transpose(inverse*/(multiplyMM(mView, rot)/*)*/).toString());
+    console.log(inverse(multiplyMM(mView, multiplyMM(t, rot))).toString());
     
     spaceCraft.draw(WVP);
     //window.requestAnimFrame(rendering, canvas);
