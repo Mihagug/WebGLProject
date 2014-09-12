@@ -61,22 +61,6 @@ Box.prototype = {
             - this.dim.x / 2.0, + this.dim.y / 2.0, + this.dim.z / 2.0
         ];
         
-
-        /*var indicies = [
-            //rear
-            0, 1, 2, 0, 3,
-            //forward
-            4, 5, 6, 4, 7,
-            //top
-            5, 1, 2, 5, 6,
-            //bottom
-            4, 7, 3, 3, 0,
-            //left
-            0, 4, 5, 0, 1,
-            //right
-            7, 6, 2, 7, 3
-        ];*/
-        
         var indicies = [
             //rear
             0, 1, 2, 2, 3, 0,
@@ -92,47 +76,39 @@ Box.prototype = {
             4, 7, 1, 4, 1, 0
         ];
         
-        /*var normals = [
-            -1.0, 0.0, 0.0,
-            0.0, -1.0, 0.0,
-            0.0, 0.0, -1.0,
-            
-            -1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, -1.0,
-            
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, -1.0,
-            
-            1.0, 0.0, 0.0,
-            0.0, -1.0, 0.0,
-            0.0, 0.0, -1.0,
-            
-            -1.0, 0.0, 0.0,
-            0.0, -1.0, 0.0,
-            0.0, 0.0, 1.0,
-            
-            1.0, 0.0, 0.0,
-            0.0, -1.0, 0.0,
-            0.0, 0.0, 1.0,
-            
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-            
-            -1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0
-        ]; */
         var normals = [
             -1.0, 0.0, 0.0,
             0.0, -1.0, 0.0,
             0.0, 0.0, -1.0,
+            
+            -1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
             1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, -1.0,
+            
+            -1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, 1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, -1.0, 0.0,
+            0.0, 0.0, 1.0,
+            
+            1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 1.0,
+            
+            -1.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
             0.0, 0.0, 1.0
-        ];
+        ]; 
         
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(verticies), this.glContext.STATIC_DRAW);
@@ -173,11 +149,11 @@ Box.prototype = {
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
         this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vPos"), 3, this.glContext.FLOAT, false, 0, 0);
-        if (this.glContext.getAttribLocation(this.program.program, "vNormals") > 0) {
+        /*if (this.glContext.getAttribLocation(this.program.program, "vNormals") > 0) {
             this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbn);
             this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vNormals"), 3, this.glContext.FLOAT, false, 0, 0);
             this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vNormals"));
-        }
+        }*/
         this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.vbi);
         //this.glContext.drawElements(this.glContext.TRIANGLE_STRIP, 6*5, this.glContext.UNSIGNED_BYTE, 0);
         this.glContext.drawElements(this.glContext.TRIANGLES, 6 * 3 * 2, this.glContext.UNSIGNED_BYTE, 0);
