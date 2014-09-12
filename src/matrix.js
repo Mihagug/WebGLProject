@@ -100,13 +100,13 @@ function multiplyMM(mat1, mat2) {
     for (var i = 0; i < len; i++) {
         for (var j = 0; j < len; j++) {
             for (var k = 0; k < len; k++) 
-                sum += mat1.array[i * len + k] * mat2.array[k * len + j];
-            res[i * len + j] = sum;
+                sum += mat1.array[k * len + i] * mat2.array[j * len + k];
+            res[j * len + i] = sum;
             sum = 0.0;
         }
     }
     
-    return new Matrix(res);
+    return (new Matrix(res));
 }
 
 function addMatrices(mat1, mat2) {
@@ -152,9 +152,10 @@ function inverse(mat) {
 
 function translate(mat, vec) {
     var temp = new Matrix(1.0);
-    temp.array[3] = vec.x;
-    temp.array[7] = vec.y;
-    temp.array[11] = vec.z;
+    
+    temp.array[12] = vec.x;
+    temp.array[13] = vec.y;
+    temp.array[14] = vec.z;
     
     return multiplyMM(temp, mat);
 }
@@ -170,6 +171,7 @@ function rotate(mat, angle, vec) {
     temp.array[4] = x*y*t + z*s; temp.array[5] = c + y*y*t; temp.array[6] = y*z*t - x*s; temp.array[7] = 0.0;
     temp.array[8] = z*x*t - y*s; temp.array[9] = z*y*t + x*s; temp.array[10] = c + z*z*t; temp.array[11] = 0.0;
     temp.array[12] = 0.0; temp.array[13] = 0.0; temp.array[14] = 0.0; temp.array[15] = 1.0;
+    temp = transpose(temp);
     
     return multiplyMM(temp, mat);
 }
@@ -202,16 +204,17 @@ function perspective(angle, asRatio, zNear, zFar) {
 }
 
 function lookAt(eye, point, vUp) {
-    var z = normalize(subVectors(eye, point));
-    var x = normalize(cross(vUp, z));
-    var y = cross(z, x);
+    var f = normalize(subVectors(point, eye));
+    var s = normalize(cross(f, vUp));
+    var u = cross(s, f);
     var temp = new Matrix(0.0);
     
-    temp.array[0] = x.x; temp.array[1] = y.x; temp.array[2] = z.x;
-    temp.array[4] = x.y; temp.array[5] = y.y; temp.array[6] = z.y;
-    temp.array[8] = x.z; temp.array[9] = y.z; temp.array[10] = z.z;
-    temp.array[12] = - dot(x, eye); temp.array[13] = - dot(y, eye); temp.array[14] = - dot(z, eye);
+    temp.array[0] = s.x; temp.array[4] = s.y; temp.array[8] = s.z;
+    temp.array[1] = u.x; temp.array[5] = u.y; temp.array[9] = u.z;
+    temp.array[2] = -f.x; temp.array[6] = -f.y; temp.array[10] = -f.z;
+    
+    temp.array[12] = - dot(s, eye); temp.array[13] = - dot(u, eye); temp.array[14] = dot(f, eye);
     temp.array[15] = 1.0;
     
-    return temp;
+    return (temp);
 }
