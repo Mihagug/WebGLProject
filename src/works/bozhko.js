@@ -189,6 +189,18 @@ SpaceCraft.prototype = {
             this.panels[i].setModelMatrix((panelsModelMats[i]));
             this.panels[i].getProgramObject().use();
             this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(W, this.panels[i].mModel))).array);
+            //light parameters
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.position"), lightPos);
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.ambient"), lightAmb);
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.diffuse"), lightDiff);
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.specular"), lightSpec);
+            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.attenuation"), lightAtten);
+            //material parameters
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "material.ambient"), matAmb);
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "material.diffuse"), matDiff);
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "material.specular"), matSpec);
+            this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "material.emission"), matEmiss);
+            this.glContext.uniform1f(this.glContext.getUniformLocation(this.panels[i].program.program, "material.shininess"), matShine);
             this.panels[i].draw(W, V, P);
         }
         
