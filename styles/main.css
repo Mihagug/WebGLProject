@@ -10,6 +10,11 @@ body {
     height: 100%;
 }
 
+#Parameters {
+    border: 2px;
+    width: 100%;
+}
+
 /*#GLParameters {
     background-color: white;
     width: 500px;
