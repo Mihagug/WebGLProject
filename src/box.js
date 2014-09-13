@@ -2,8 +2,18 @@ var boxVShader = [
     "#version 100",
     "precision highp float;",
     "attribute vec4 vPos;",
-    "uniform mat4 MVP;",
+    "",
+    "uniform struct Transform {",
+    "   mat4 model;",
+    "   mat4 world;",
+    "   mat4 view;",
+    "   mat4 projection;",
+    "   mat3 normMatrix;",
+    "   vec3 viewPosition;",
+    "} transform;",
+    "",
     "void main() {",
+    "   mat4 MVP = transform.projection * transform.view * transform.world * transform.model;",
     "   gl_Position = MVP * vPos;",
     "}"
 ].join("\n");
@@ -136,11 +146,14 @@ Box.prototype = {
         this.color = vec3OfColor;
     },
     
-    draw: function(WVP) {
-        var MVP = multiplyMM(WVP, this.mModel);
+    draw: function(W, V, P) {
+        //var MVP = multiplyMM(WVP, this.mModel);
         
         this.glContext.uniform3fv(this.glContext.getUniformLocation(this.program.program, "color"), this.color.arrayRep);
-        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "MVP"), false, MVP.array);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "transform.projection"), false, P.array);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "transform.view"), false, V.array);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "transform.world"), false, W.array);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.program.program, "transform.model"), false, this.mModel.array);
         
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
@@ -162,14 +175,6 @@ Box.prototype = {
     getProgramObject: function() {
         return this.program;
     },
-    
-/*    rotateM: function(mRot) {
-        this.mRotate = mRot;
-    },
-    
-    translateM: function(mTrans) {
-        this.mTranslate = mTrans;
-    },*/
     
     clear: function() {
         this.program.deleteProgram();

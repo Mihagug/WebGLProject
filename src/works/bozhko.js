@@ -16,33 +16,83 @@ var panelVShader = [
     "attribute vec4 vPos;",
     "attribute vec3 vNormals;",
     "",
-    "uniform mat4 MVP;",
-    "uniform mat4 normMatrix;",
+    "uniform struct Transform {",
+    "   mat4 model;",
+    "   mat4 world;",
+    "   mat4 view;",
+    "   mat4 projection;",
+    "   mat4 normMatrix;",
+    "   vec3 viewPosition;",
+    "} transform;",
     "",
-    "varying vec3 vDefNormals;",
+    "uniform struct PointLight {",
+    "   vec4 position;",
+    "   vec4 ambient;",
+    "   vec4 diffuse;",
+    "   vec4 specular;",
+    "   vec3 attenuation;",
+    "} light;",
+    "",
+    "varying vec3 normal;",
+    "varying vec3 lightDir;",
+    "varying vec3 viewDir;",
+    "varying float distance;",
     "",
     "void main() {",
+    "   mat4 MVP = transform.projection * transform.view * transform.world * transform.model;",
     "   gl_Position = MVP * vPos;",
-    "   vDefNormals = (normMatrix * vec4(vNormals, 0.0)).xyz;",
+    "",
+    "   vec4 vertex = transform.world * transform.model * vPos;",
+    "   lightDir = vec3(light.position - vertex);",
+    "",
+    "   normal = vec3(transform.normMatrix * vec4(vNormals, 0.0));",
+    "   viewDir = transform.viewPosition - vec3(vertex);",
+    "   distance = length(lightDir);",
     "}"
 ].join("\n");
 
 var panelFShader = [
     "#version 100",
     "precision highp float;",
-    "uniform vec3 color;",
-    "varying vec3 vDefNormals;",
-    "struct DirLight {",
-    "   vec3 vColor;",
-    "   vec3 vDirection;",
-    "   float ambientIntensity;",
-    "};",
     "",
-    "uniform DirLight sunLight;",
+    "uniform vec3 color;",
+    "",
+    "uniform struct PointLight {",
+    "   vec4 position;",
+    "   vec4 ambient;",
+    "   vec4 diffuse;",
+    "   vec4 specular;",
+    "   vec3 attenuation;",
+    "} light;",
+    "",
+    "uniform struct Material {",
+    "   vec4 ambient;",
+    "   vec4 diffuse;",
+    "   vec4 specular;",
+    "   vec4 emission;",
+    "   float shininess;",
+    "} material;",
+    "",
+    "varying vec3 normal;",
+    "varying vec3 lightDir;",
+    "varying vec3 viewDir;",
+    "varying float distance;",
+    "",
     "void main() {",
-    "   float fDiffuseIntensity = max(0.0, dot(normalize(vDefNormals), -sunLight.vDirection));",
-    "   gl_FragColor = vec4(color, 1.0) * vec4(sunLight.vColor * (sunLight.ambientIntensity + fDiffuseIntensity), 1.0);",
-    "   //gl_FragColor = vec4(color, 1.0);",
+    "   vec4 outColor;",
+    "   vec3 outNormal = normalize(normal);",
+    "   vec3 outLightDir = normalize(lightDir);",
+    "   vec3 outViewDir = normalize(viewDir);",
+    "",
+    "   float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * distance * distance);",
+    "   outColor = material.emission;",
+    "   outColor += material.ambient * light.ambient * attenuation;",
+    "   float NdotL = max(dot(outNormal, outLightDir), 0.0);",
+    "   outColor += material.diffuse * light.diffuse * NdotL * attenuation;",
+    "   float RdotVpow = max(pow(dot(reflect(-outLightDir, outNormal), outViewDir), material.shininess), 0.0);",
+    "   outColor += material.specular * light.specular * RdotVpow * attenuation;",
+    "   outColor *= vec4(color, 1.0);",
+    "   gl_FragColor = outColor;",
     "}"
 ].join("\n");
 
@@ -50,6 +100,7 @@ function SpaceCraft(glContext) {
     this.mainBox = new Box(new Vector(0, 0, 0), new Vector(1.0, 1.0, 1.0), glContext);
     this.mainBox.setVertexShader(panelVShader);
     this.mainBox.setFragmentShader(panelFShader);
+    this.mainBox.setColor(new Vector(1.0, 0.0, 0.0));
     
     this.panels = [];
     this.panels[0] = new Box(new Vector(0, 0, 0.0), new Vector(1.0, 0.01, 1.0), glContext);
@@ -58,8 +109,8 @@ function SpaceCraft(glContext) {
     this.panels[3] = new Box(new Vector(2.06, -0.5, 0.0), new Vector(1.0, 0.01, 1.0), glContext);
     
     for(var i = 0; i < 4; i++) {
-        this.panels[i].setVertexShader(panelVShader);
-        this.panels[i].setFragmentShader(panelFShader);
+//        this.panels[i].setVertexShader(panelVShader);
+//        this.panels[i].setFragmentShader(panelFShader);
         this.panels[i].setColor(new Vector(0.4, 0.4, 1.0));
     }
     
@@ -75,7 +126,7 @@ SpaceCraft.prototype = {
         }
     },
     
-    draw: function(WVP) {
+    draw: function(W, V, P) {
         if (this.j == resultsSpaceCraft.length - 1)
             this.j = 0;
         
@@ -106,19 +157,39 @@ SpaceCraft.prototype = {
         panelsModelMats[3] = translate(panelsModelMats[3], new Vector(0.56, -0.5, 0.0));
 
         this.mainBox.getProgramObject().use();
-        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "normMatrix"), this.glContext.FALSE, transpose(inverse(WV)).array);
-        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "sunLight.vColor"), [0.2, 0.2, 0.2]);
-        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "sunLight.vDirection"), [0.0, 10.0, 0.0]);
-        this.glContext.uniform1f(this.glContext.getUniformLocation(this.mainBox.program.program, "sunLight.ambientIntention"), 0.1);
-        this.mainBox.draw(WVP);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(W, this.mainBox.mModel))).array);
+        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "transform.viewPosition"), [4.0, 4.0, 4.0]);
+        /*//light parameters
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.position"), [4.0, 0.0, 0.0, 1.0]);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.ambient"), [0.1, 0.1, 0.1, 1.0]);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.diffuse"), [0.4, 0.4, 0.4, 1.0]);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.specular"), [0.7, 0.7, 0.7, 1.0]);
+        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.attenuation"), [0.1, 0.1, 0.1]);
+        //material parameters
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.ambient"), [0.1, 0.1, 0.1, 1.0]);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.diffuse"), [0.6, 0.6, 0.6, 1.0]);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.specular"), [0.2, 0.2, 0.2, 1.0]);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.emission"), [1.0, 1.0, 1.0, 1.0]);
+        this.glContext.uniform1f(this.glContext.getUniformLocation(this.mainBox.program.program, "material.shininess"), 0.5);*/
+         //light parameters
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.position"), lightPos);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.ambient"), lightAmb);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.diffuse"), lightDiff);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.specular"), lightSpec);
+        this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.attenuation"), lightAtten);
+        //material parameters
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.ambient"), matAmb);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.diffuse"), matDiff);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.specular"), matSpec);
+        this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.emission"), matEmiss);
+        this.glContext.uniform1f(this.glContext.getUniformLocation(this.mainBox.program.program, "material.shininess"), matShine);
+        
+        this.mainBox.draw(W, V, P);
         for (var i = 0; i < 4; i++) {
             this.panels[i].setModelMatrix((panelsModelMats[i]));
             this.panels[i].getProgramObject().use();
-            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "normMatrix"), this.glContext.FALSE, transpose(inverse(WV)).array);
-            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vColor"), [0.2, 0.2, 0.2]);
-            this.glContext.uniform3fv(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.vDirection"), [0.0, 10.0, 0.0]);
-            this.glContext.uniform1f(this.glContext.getUniformLocation(this.panels[i].program.program, "sunLight.ambientIntention"), 0.1);
-            this.panels[i].draw(WVP);
+            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(W, this.panels[i].mModel))).array);
+            this.panels[i].draw(W, V, P);
         }
         
         this.j++;
