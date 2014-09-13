@@ -109,8 +109,8 @@ function SpaceCraft(glContext) {
     this.panels[3] = new Box(new Vector(2.06, -0.5, 0.0), new Vector(1.0, 0.01, 1.0), glContext);
     
     for(var i = 0; i < 4; i++) {
-//        this.panels[i].setVertexShader(panelVShader);
-//        this.panels[i].setFragmentShader(panelFShader);
+        this.panels[i].setVertexShader(panelVShader);
+        this.panels[i].setFragmentShader(panelFShader);
         this.panels[i].setColor(new Vector(0.4, 0.4, 1.0));
     }
     
