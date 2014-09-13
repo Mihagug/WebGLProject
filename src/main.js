@@ -14,6 +14,8 @@ var matSpec = [];
 var matEmiss = [];
 var matShine;
 
+var light;
+
 function showParameters(glContext) {
     var divTable = document.getElementById("GLParameters");
     divTable.innerHTML = "VENDOR: " + glContext.getParameter(glContext.VENDOR) + "<br />";
@@ -51,6 +53,10 @@ window.onload = function () {
     spaceCraft = new SpaceCraft(gl);
     spaceCraft.init();
     
+    light = new Box(new Vector(lightPos[0], lightPos[1], lightPos[2]), new Vector(0.5, 0.5, 0.5), gl);
+    light.init();
+    light.setColor(new Vector(1.0, 1.0, 1.0));
+    
     rendering();
 }
 
@@ -81,6 +87,10 @@ function rendering() {
     var mWorld = multiplyMM(mTranslate, mRot);
     var mPerspective = perspective(60.0, areaWidth / areaHeight, 1.0, 100.0);
     var mView = lookAt(new Vector(4, 4, 4), new Vector(1, 1, 1), new Vector(0, 1, 0));
+    
+    light.setModelMatrix(translate(new Matrix(1.0), new Vector(lightPos[0], lightPos[1], lightPos[2])));
+    light.program.use();
+    light.draw(mWorld, mView, mPerspective);
     
     spaceCraft.draw(mWorld, mView, mPerspective);
     //window.requestAnimFrame(rendering, canvas);
