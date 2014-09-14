@@ -171,6 +171,7 @@ SpaceCraft.prototype = {
         this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.specular"), [0.2, 0.2, 0.2, 1.0]);
         this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "material.emission"), [1.0, 1.0, 1.0, 1.0]);
         this.glContext.uniform1f(this.glContext.getUniformLocation(this.mainBox.program.program, "material.shininess"), 0.5);*/
+        
          //light parameters
         this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.position"), lightPos);
         this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.ambient"), lightAmb);

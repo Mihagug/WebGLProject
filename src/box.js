@@ -73,16 +73,48 @@ Box.prototype = {
             //rear
             0, 1, 2, 2, 3, 0,
             //forward
-            4, 5, 6, 4, 6, 7,
+            4, 5, 6, 6, 7, 4,
             //top
-            1, 7, 6, 1, 6, 2,
+            1, 7, 6, 6, 2, 1,
             //bottom
-            4, 0, 3, 4, 3, 5,
+            4, 0, 3, 3, 5, 4,
             //left
-            3, 2, 6, 3, 6, 5,
+            3, 2, 6, 6, 5, 3,
             //right
-            4, 7, 1, 4, 1, 0
+            4, 7, 1, 1, 0, 4
         ];
+        
+        /*var points = [];
+        for (var i = 0, j = 0; i < verticies.length; i += 3, j++) {
+            points[j] = new Vector(verticies[i], verticies[i + 1], verticies[i + 2]);
+        }
+
+        var vNormals = [];
+        vNormals[0] = normalize(cross(subVectors(points[2], points[1]), subVectors(points[0], points[1])));
+        vNormals[1] = normalize(cross(subVectors(points[0], points[3]), subVectors(points[2], points[3])));
+        
+        vNormals[2] = normalize(cross(subVectors(points[6], points[5]), subVectors(points[4], points[5])));
+        vNormals[3] = normalize(cross(subVectors(points[4], points[7]), subVectors(points[6], points[7])));
+        
+        vNormals[4] = normalize(cross(subVectors(points[6], points[7]), subVectors(points[1], points[7])));
+        vNormals[5] = normalize(cross(subVectors(points[1], points[2]), subVectors(points[6], points[2])));
+        
+        vNormals[6] = normalize(cross(subVectors(points[3], points[0]), subVectors(points[4], points[0])));
+        vNormals[7] = normalize(cross(subVectors(points[4], points[5]), subVectors(points[3], points[5])));
+        
+        vNormals[8] = normalize(cross(subVectors(points[6], points[2]), subVectors(points[3], points[2])));
+        vNormals[9] = normalize(cross(subVectors(points[3], points[5]), subVectors(points[6], points[5])));
+        
+        vNormals[10] = normalize(cross(subVectors(points[1], points[7]), subVectors(points[4], points[7])));
+        vNormals[11] = normalize(cross(subVectors(points[4], points[0]), subVectors(points[1], points[0])));
+        
+        var normals = [
+        ];
+        for (var i = 0; i < vNormals.length; i++) {
+            for (var j = 0; j < vNormals[i].arrayRep.length; j++) {
+                normals.push(vNormals[i].arrayRep[j]);
+            }
+        }*/
         
         var normals = [
             -1.0, 0.0, 0.0,
@@ -116,7 +148,7 @@ Box.prototype = {
             -1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
             0.0, 0.0, 1.0
-        ]; 
+        ];
         
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(verticies), this.glContext.STATIC_DRAW);
@@ -157,12 +189,14 @@ Box.prototype = {
         
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));
+        
         this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vPos"), 3, this.glContext.FLOAT, false, 0, 0);
         if (this.glContext.getAttribLocation(this.program.program, "vNormals") > 0) {
             this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbn);
             this.glContext.vertexAttribPointer(this.glContext.getAttribLocation(this.program.program, "vNormals"), 3, this.glContext.FLOAT, false, 0, 0);
             this.glContext.enableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vNormals"));
         }
+        
         this.glContext.bindBuffer(this.glContext.ELEMENT_ARRAY_BUFFER, this.vbi);
         this.glContext.drawElements(this.glContext.TRIANGLES, 6 * 3 * 2, this.glContext.UNSIGNED_BYTE, 0);
         this.glContext.disableVertexAttribArray(this.glContext.getAttribLocation(this.program.program, "vPos"));

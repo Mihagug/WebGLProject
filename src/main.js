@@ -16,6 +16,11 @@ var matShine;
 
 var light;
 
+function mouseEvents(Event) {
+    var pixels = new Uint8Array(4);
+    console.log("(" + Event.clientX + ", " + Event.clientY + ")");
+}
+
 function showParameters(glContext) {
     var divTable = document.getElementById("GLParameters");
     divTable.innerHTML = "VENDOR: " + glContext.getParameter(glContext.VENDOR) + "<br />";
@@ -41,6 +46,7 @@ window.onresize = function() {
 
 window.onload = function () {
     canvas = document.getElementById("GLCanvas");
+    canvas.addEventListener("mousedown", mouseEvents);
     areaWidth = canvas.clientWidth;
     areaHeight = canvas.clientHeight;
     canvas.width = areaWidth;
@@ -53,7 +59,7 @@ window.onload = function () {
     spaceCraft = new SpaceCraft(gl);
     spaceCraft.init();
     
-    light = new Box(new Vector(lightPos[0], lightPos[1], lightPos[2]), new Vector(0.5, 0.5, 0.5), gl);
+    light = new Box(new Vector(lightPos[0], lightPos[1], lightPos[2]), new Vector(0.2, 0.2, 0.2), gl);
     light.init();
     light.setColor(new Vector(1.0, 1.0, 1.0));
     
@@ -90,9 +96,10 @@ function rendering() {
     
     light.setModelMatrix(translate(new Matrix(1.0), new Vector(lightPos[0], lightPos[1], lightPos[2])));
     light.program.use();
-    light.draw(mWorld, mView, mPerspective);
+    light.draw(new Matrix(1.0), mView, mPerspective);
     
     spaceCraft.draw(mWorld, mView, mPerspective);
+
     //window.requestAnimFrame(rendering, canvas);
     setTimeout(function() {window.requestAnimFrame(rendering, canvas)}, 50);
 }
