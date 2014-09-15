@@ -1,0 +1,6 @@
+#ignore
+*.docx
+*pdf
+*.nb
+*.m
+/GroupCourseWorks
