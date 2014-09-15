@@ -54,6 +54,9 @@ window.onload = function () {
     gl = WebGLUtils.setupWebGL(canvas);
     gl.viewport(0, 0, areaWidth, areaHeight);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    
+    gl.enable(gl.CULL_FACE);
+    gl.cullFace(gl.FRONT);
     //showParameters(gl);
     
     spaceCraft = new SpaceCraft(gl);
