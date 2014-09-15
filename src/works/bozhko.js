@@ -157,7 +157,7 @@ SpaceCraft.prototype = {
         panelsModelMats[3] = translate(panelsModelMats[3], new Vector(0.56, -0.5, 0.0));
 
         this.mainBox.getProgramObject().use();
-        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(W, this.mainBox.mModel))).array);
+        this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(V, multiplyMM(W, this.mainBox.mModel)))).array);
         this.glContext.uniform3fv(this.glContext.getUniformLocation(this.mainBox.program.program, "transform.viewPosition"), [4.0, 4.0, 4.0]);
         /*//light parameters
         this.glContext.uniform4fv(this.glContext.getUniformLocation(this.mainBox.program.program, "light.position"), [4.0, 0.0, 0.0, 1.0]);
@@ -189,7 +189,7 @@ SpaceCraft.prototype = {
         for (var i = 0; i < 4; i++) {
             this.panels[i].setModelMatrix((panelsModelMats[i]));
             this.panels[i].getProgramObject().use();
-            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(W, this.panels[i].mModel))).array);
+            this.glContext.uniformMatrix4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "transform.normMatrix"), this.glContext.FALSE, transpose(inverse(multiplyMM(V, multiplyMM(W, this.panels[i].mModel)))).array);
             //light parameters
             this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.position"), lightPos);
             this.glContext.uniform4fv(this.glContext.getUniformLocation(this.panels[i].program.program, "light.ambient"), lightAmb);

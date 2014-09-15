@@ -84,7 +84,7 @@ Box.prototype = {
             4, 7, 1, 1, 0, 4
         ];
         
-        /*var points = [];
+        var points = [];
         for (var i = 0, j = 0; i < verticies.length; i += 3, j++) {
             points[j] = new Vector(verticies[i], verticies[i + 1], verticies[i + 2]);
         }
@@ -114,9 +114,9 @@ Box.prototype = {
             for (var j = 0; j < vNormals[i].arrayRep.length; j++) {
                 normals.push(vNormals[i].arrayRep[j]);
             }
-        }*/
+        }
         
-        var normals = [
+        /*var normals = [
             -1.0, 0.0, 0.0,
             0.0, -1.0, 0.0,
             0.0, 0.0, -1.0,
@@ -148,7 +148,7 @@ Box.prototype = {
             -1.0, 0.0, 0.0,
             0.0, 1.0, 0.0,
             0.0, 0.0, 1.0
-        ];
+        ];*/
         
         this.glContext.bindBuffer(this.glContext.ARRAY_BUFFER, this.vbo);
         this.glContext.bufferData(this.glContext.ARRAY_BUFFER, new Float32Array(verticies), this.glContext.STATIC_DRAW);
